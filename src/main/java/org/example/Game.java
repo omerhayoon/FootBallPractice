@@ -23,10 +23,10 @@ public class Game {
         createLeagueTable();
         startGame();
         //findMatchesByTeam(1);
-       //findTopScoringTeams(3);
-       // findPlayersWithAtLeastNGoals(5);
-     // getTeamByPosition(10);
-     //   getTopScorers(2);
+        // findTopScoringTeams(3);
+        // findPlayersWithAtLeastNGoals(5);
+        // getTeamByPosition(10);
+        //   getTopScorers(2);
 
     }
 
