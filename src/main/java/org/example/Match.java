@@ -42,7 +42,7 @@ public class Match {
             System.out.println("Id Match: "+this.id+ " Home Team: "+ this.homeTeam.getName()+ " VS "+ "Away Team: " +this.awayTeam.getName());
         IntStream.range(0,10).forEach(value -> { // סופר עד 10
             try {
-                Thread.sleep(1000); // עתירה של שניה בספירה לאחור
+                Thread.sleep(2); // עתירה של שניה בספירה לאחור
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

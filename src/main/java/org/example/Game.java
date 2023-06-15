@@ -16,9 +16,10 @@ public class Game {
     private Player player;
     private List<List<Match>> leagueTable;
     private List<Team> scoreboard;
+    private int round = 0;
 
 
-    public Game(){
+    public Game() {
         createTeam();
         createLeagueTable();
         startGame();
@@ -31,57 +32,55 @@ public class Game {
     }
 
 
-    public List<Match> findMatchesByTeam(int teamId){
-        List<Match>MatchesByTeam=leagueTable.stream()
+    public List<Match> findMatchesByTeam(int teamId) {
+        List<Match> MatchesByTeam = leagueTable.stream()
                 .flatMap(List::stream)//משטח לרשימה אחת של קרבות משחק
-                .filter(item->item.getHomeTeam().getId()==teamId||item.getAwayTeam().getId()==teamId).toList();// עושה את הסינון בין כל קרבות המשחק
+                .filter(item -> item.getHomeTeam().getId() == teamId || item.getAwayTeam().getId() == teamId).toList();// עושה את הסינון בין כל קרבות המשחק
 
         return MatchesByTeam;
     }
 
-    public List<Team> findTopScoringTeams(int n){
-        List<Team> topScoring=teams.stream()
+    public List<Team> findTopScoringTeams(int n) {
+        List<Team> topScoring = teams.stream()
                 .sorted(Comparator.comparingInt(Team::getPoints).reversed())
                 .limit(n)
                 .toList();
-         System.out.println(topScoring);
+        System.out.println(topScoring);
         return topScoring;
 
     }
 
-    public List<Player> findPlayersWithAtLeastNGoals(int n){
+    public List<Player> findPlayersWithAtLeastNGoals(int n) {
         List<List<Goal>> listAllGoal = leagueTable.stream().flatMap(List::stream).map(Match::getGoals).toList();// יצירת רשימה של כל הרשימות של גול
-        Map<Player,Long> playersLeastNGoals=listAllGoal.stream().flatMap(List::stream)// רשימה אחת של גול
-                .collect(groupingBy(Goal::getScorer,Collectors.counting()));// יצירת מפה עם כמות הפעמים שמופיע השחקן
-        List<Player> result=playersLeastNGoals.entrySet().stream().filter(item->item.getValue()>=n).map(Map.Entry::getKey).toList();
+        Map<Player, Long> playersLeastNGoals = listAllGoal.stream().flatMap(List::stream)// רשימה אחת של גול
+                .collect(groupingBy(Goal::getScorer, Collectors.counting()));// יצירת מפה עם כמות הפעמים שמופיע השחקן
+        List<Player> result = playersLeastNGoals.entrySet().stream().filter(item -> item.getValue() >= n).map(Map.Entry::getKey).toList();
         System.out.println(result);
 
-                return result;
+        return result;
     }
-    public Team getTeamByPosition(int position){
-        System.out.println(scoreboard.get(position-1));
-        return scoreboard.get(position-1);
+
+    public Team getTeamByPosition(int position) {
+        System.out.println(scoreboard.get(position - 1));
+        return scoreboard.get(position - 1);
 
     }
-    public Map<Integer, Integer> getTopScorers(int n){
 
-
-        Map<Integer,Integer> topScorers=leagueTable.stream()
+    public Map<Integer, Integer> getTopScorers(int n) {
+        Map<Integer, Integer> topScorers = leagueTable.stream()
                 .flatMap(List::stream)
                 .map(Match::getGoals)
                 .flatMap(List::stream)
                 .map(Goal::getScorer)
                 .collect(groupingBy(Player::getId, summingInt(player -> 1)));
 
-        Map<Integer,Integer> result=topScorers.entrySet()
+        Map<Integer, Integer> result = topScorers.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .limit(n)
                 .sorted(Map.Entry.comparingByValue())
                 .collect(HashMap::new, (m, entry) -> m.put(entry.getKey(), entry.getValue()), HashMap::putAll);
-        int i=0;
-
-
+        int i = 0;
 
 
         return null;
@@ -89,34 +88,78 @@ public class Game {
 
     }
 
-    public void startGame(){
-        IntStream.range(0,this.leagueTable.size()).forEach(value -> {
-            System.out.println("Game cycle: "+ value);
-            List<Match> game=this.leagueTable.get(value);
+    public void startGame() {
+        Scanner scanner = new Scanner(System.in);
+        IntStream.range(0, this.leagueTable.size()).forEach(value -> {
+            System.out.println("Game cycle: " + value);
+            List<Match> game = this.leagueTable.get(value);
             game.stream().map(Match::startMatch).toList();
+            if (value == round) {
+                printLeagueTable();
+                choseOption();
+                round++;
+            }
+
         });
 
-        //game1.stream().map(Match::startMatch).toList();
         printLeagueTable();
+        choseOption();
+    }
+
+    public void choseOption() {
+        Scanner scanner = new Scanner(System.in);
+        int chose;
+        System.out.println("Choose an option between 1 to 5 :" + "\n" +
+                " 1 : findMatchesByTeam " + "\n" +
+                " 2 : findTopScoringTeams" + "\n" +
+                " 3 : findPlayersWithAtLeastNGoals" + "\n" +
+                " 4 : getTeamByPosition" + "\n" +
+                " 5 : getTopScorers"
+        );
+        chose = scanner.nextInt();
+        switch (chose){
+            case (1)-> {
+                System.out.println("Enter teamId:");
+                int teamId=scanner.nextInt();
+                findMatchesByTeam(teamId);
+            }
+            case (2)->{
+                System.out.println("Enter numbers of team:");
+                int numberOfTeam=scanner.nextInt();
+                findTopScoringTeams(numberOfTeam);
+
+            }
+            case (3)->{
+                System.out.println("Enter at least goals:");
+                int gol=scanner.nextInt();
+                findPlayersWithAtLeastNGoals(gol);
+
+            }
+            case (4)->{
+            }
+            case (5)->{
+            }
+        }
 
     }
-    public void printLeagueTable(){
 
-       scoreboard= teams.stream()
-              .sorted(Comparator.comparing(Team::getPoints)
-                      .thenComparing(Team::getDifference).reversed()
-                      .thenComparing(Team::getName)).toList();
+    public void printLeagueTable() {
+
+        scoreboard = teams.stream()
+                .sorted(Comparator.comparing(Team::getPoints)
+                        .thenComparing(Team::getDifference).reversed()
+                        .thenComparing(Team::getName)).toList();
 
         System.out.println("League results: ");
-      IntStream.range(0,scoreboard.size()).forEach(value -> {
-          System.out.println("the place "+(value+1)+": " +
-                  scoreboard.get(value).getName()+
-                  " Points: "+scoreboard.get(value).getPoints()+
-                  " Difference " +scoreboard.get(value).getDifference());
-      });
+        IntStream.range(0, scoreboard.size()).forEach(value -> {
+            System.out.println("the place " + (value + 1) + ": " +
+                    scoreboard.get(value).getName() +
+                    " Points: " + scoreboard.get(value).getPoints() +
+                    " Difference " + scoreboard.get(value).getDifference());
+        });
 
 
-}
+    }
 
     public void createLeagueTable() {
         List<List<Integer>> combinations = IntStream.range(0, teams.size())
@@ -136,29 +179,31 @@ public class Game {
         System.out.println(leagueTable);
 
     }
-        public void createTeam() {
-            List<List<String>> readForFile;
-            try {
-                readForFile = readFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            this.teams = readForFile.stream().map(item->{
-                int id= Integer.parseInt(item.get(0));
-                String name=item.get(1);
-                List<Player> players=createPlayers();
-                return new Team(id,name,players);
-            }).toList();
-            System.out.println(teams);
 
+    public void createTeam() {
+        List<List<String>> readForFile;
+        try {
+            readForFile = readFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+        this.teams = readForFile.stream().map(item -> {
+            int id = Integer.parseInt(item.get(0));
+            String name = item.get(1);
+            List<Player> players = createPlayers();
+            return new Team(id, name, players);
+        }).toList();
+        System.out.println(teams);
 
-        public List<Player> createPlayers (){
-        List <Player> players = new ArrayList<>();
-        IntStream.range(1,16).forEach(value ->  players.add( player=new Player()));
-            return players;
-        }
-        public  List<List<String>> readFile() throws IOException {
+    }
+
+    public List<Player> createPlayers() {
+        List<Player> players = new ArrayList<>();
+        IntStream.range(1, 16).forEach(value -> players.add(player = new Player()));
+        return players;
+    }
+
+    public List<List<String>> readFile() throws IOException {
         List<List<String>> records = new ArrayList<>();
 
         BufferedReader br = null;
@@ -184,9 +229,7 @@ public class Game {
     }
 
 
-
-
-    }
+}
 
 
 
