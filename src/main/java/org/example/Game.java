@@ -16,14 +16,18 @@ public class Game {
     private Player player;
     private List<List<Match>> leagueTable;
     private List<Team> scoreboard;
-    private int round = 0;
+    private int cycle = 0;
+
+    enum NumberRange {
+        ONE, TWO, THREE, FOUR, FIVE
+    }
 
 
     public Game() {
         createTeam();
         createLeagueTable();
         startGame();
-        //findMatchesByTeam(1);
+//        findMatchesByTeam(3);
         // findTopScoringTeams(3);
         // findPlayersWithAtLeastNGoals(5);
         // getTeamByPosition(10);
@@ -31,12 +35,28 @@ public class Game {
 
     }
 
+    public static NumberRange validateNumber(int number) {
+        switch (number) {
+            case 1:
+                return NumberRange.ONE;
+            case 2:
+                return NumberRange.TWO;
+            case 3:
+                return NumberRange.THREE;
+            case 4:
+                return NumberRange.FOUR;
+            case 5:
+                return NumberRange.FIVE;
+            default:
+                return null;
+        }
+    }
+
 
     public List<Match> findMatchesByTeam(int teamId) {
         List<Match> MatchesByTeam = leagueTable.stream()
                 .flatMap(List::stream)//משטח לרשימה אחת של קרבות משחק
                 .filter(item -> item.getHomeTeam().getId() == teamId || item.getAwayTeam().getId() == teamId).toList();// עושה את הסינון בין כל קרבות המשחק
-
         return MatchesByTeam;
     }
 
@@ -94,21 +114,49 @@ public class Game {
             System.out.println("Game cycle: " + value);
             List<Match> game = this.leagueTable.get(value);
             game.stream().map(Match::startMatch).toList();
-            if (value == round) {
+            if (value == cycle) {
                 printLeagueTable();
                 choseOption();
-                round++;
+                cycle++;
             }
 
         });
-
         printLeagueTable();
         choseOption();
     }
 
+    public boolean checkingWord(int word) {
+        boolean result = true;
+        String newWord = Integer.toString(word);
+        for (int i = 0; i < newWord.length(); i++) {
+            if (newWord.charAt(i) >= 'a' && newWord.charAt(i) <= 'z') {
+                result = false;
+                break;
+            }
+            if (newWord.charAt(i) >= 'A' && newWord.charAt(i) <= 'Z') {
+                result = false;
+                break;
+            }
+        }
+        return result;
+    }
+//    public boolean valid(int number){
+//         boolean valid=true;
+//         String check=Integer.toString(number);
+//         for (int i=0;i<check.length();i++){
+//             if (check.charAt(i)>'a'&&check.charAt(i)<'z'){
+//                 valid=false;
+//                 break;
+//             }
+//         }
+//
+//         return valid;
+//    }
+
+
     public void choseOption() {
         Scanner scanner = new Scanner(System.in);
-        int chose;
+        int chose = 0;
         System.out.println("Choose an option between 1 to 5 :" + "\n" +
                 " 1 : findMatchesByTeam " + "\n" +
                 " 2 : findTopScoringTeams" + "\n" +
@@ -116,32 +164,48 @@ public class Game {
                 " 4 : getTeamByPosition" + "\n" +
                 " 5 : getTopScorers"
         );
-        chose = scanner.nextInt();
-        switch (chose){
-            case (1)-> {
+            while (chose < 1 || chose > 5) {
+                chose = scanner.nextInt();
+                System.out.println("Enter number between 1 - 5");
+            }
+        NumberRange number = validateNumber(chose);
+        switch (number) {
+            case ONE:
                 System.out.println("Enter teamId:");
-                int teamId=scanner.nextInt();
-                findMatchesByTeam(teamId);
-            }
-            case (2)->{
+                int teamId = scanner.nextInt();
+                System.out.println(findMatchesByTeam(teamId));
+                break;
+
+            case TWO:// עובד. רק לסדר הכנסת קלט תקין
                 System.out.println("Enter numbers of team:");
-                int numberOfTeam=scanner.nextInt();
+                int numberOfTeam = scanner.nextInt();
                 findTopScoringTeams(numberOfTeam);
+                break;
 
-            }
-            case (3)->{
+
+            case THREE:// עובד. רק לסדר הכנסת קלט תקין
                 System.out.println("Enter at least goals:");
-                int gol=scanner.nextInt();
+                int gol = scanner.nextInt();
                 findPlayersWithAtLeastNGoals(gol);
+                break;
 
-            }
-            case (4)->{
-            }
-            case (5)->{
-            }
+
+            case FOUR:// עובד. רק לסדר הכנסת קלט תקין
+                System.out.println("Enter the position you want to get:");
+                int position = scanner.nextInt();
+                getTeamByPosition(position);
+                break;
+
+            case FIVE:// לסדר פונקצייה. מחזיר null
+                System.out.println("Enter the number of player that score the most goals:");
+                int topScorers = scanner.nextInt();
+                System.out.println(getTopScorers(topScorers));
+                break;
+
         }
 
     }
+
 
     public void printLeagueTable() {
 
