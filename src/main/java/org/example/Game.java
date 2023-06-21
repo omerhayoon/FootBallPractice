@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.summingInt;
 
 public class Game {
     private List<Team> teams;
@@ -92,21 +91,17 @@ public class Game {
                 .map(Match::getGoals)
                 .flatMap(List::stream)
                 .map(Goal::getScorer)
-                .collect(groupingBy(Player::getId, summingInt(player -> 1)));
+                .collect(Collectors.groupingBy(Player::getId, Collectors.summingInt(player -> 1)));
 
         Map<Integer, Integer> result = topScorers.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .limit(n)
-                .sorted(Map.Entry.comparingByValue())
-                .collect(HashMap::new, (m, entry) -> m.put(entry.getKey(), entry.getValue()), HashMap::putAll);
-        int i = 0;
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
-
-        return null;
-
-
+        return result;
     }
+
 
     public void startGame() {
         Scanner scanner = new Scanner(System.in);
@@ -125,21 +120,21 @@ public class Game {
         choseOption();
     }
 
-    public boolean checkingWord(int word) {
-        boolean result = true;
-        String newWord = Integer.toString(word);
-        for (int i = 0; i < newWord.length(); i++) {
-            if (newWord.charAt(i) >= 'a' && newWord.charAt(i) <= 'z') {
-                result = false;
-                break;
-            }
-            if (newWord.charAt(i) >= 'A' && newWord.charAt(i) <= 'Z') {
-                result = false;
-                break;
-            }
-        }
-        return result;
-    }
+//    public boolean checkingWord(int word) {
+//        boolean result = true;
+//        String newWord = Integer.toString(word);
+//        for (int i = 0; i < newWord.length(); i++) {
+//            if (newWord.charAt(i) >= 'a' && newWord.charAt(i) <= 'z') {
+//                result = false;
+//                break;
+//            }
+//            if (newWord.charAt(i) >= 'A' && newWord.charAt(i) <= 'Z') {
+//                result = false;
+//                break;
+//            }
+//        }
+//        return result;
+//    }
 //    public boolean valid(int number){
 //         boolean valid=true;
 //         String check=Integer.toString(number);
@@ -166,20 +161,30 @@ public class Game {
         );
             while (chose < 1 || chose > 5) {
                 chose = scanner.nextInt();
-                System.out.println("Enter number between 1 - 5");
+//                System.out.println("Enter number between 1 - 5");
             }
         NumberRange number = validateNumber(chose);
         switch (number) {
-            case ONE:
+            case ONE:// מחזיר כתובות במקום את הרשימה עצמה   לתקן !
                 System.out.println("Enter teamId:");
                 int teamId = scanner.nextInt();
                 System.out.println(findMatchesByTeam(teamId));
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
 
             case TWO:// עובד. רק לסדר הכנסת קלט תקין
                 System.out.println("Enter numbers of team:");
                 int numberOfTeam = scanner.nextInt();
                 findTopScoringTeams(numberOfTeam);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
 
 
@@ -187,6 +192,11 @@ public class Game {
                 System.out.println("Enter at least goals:");
                 int gol = scanner.nextInt();
                 findPlayersWithAtLeastNGoals(gol);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
 
 
@@ -194,12 +204,22 @@ public class Game {
                 System.out.println("Enter the position you want to get:");
                 int position = scanner.nextInt();
                 getTeamByPosition(position);
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
 
-            case FIVE:// לסדר פונקצייה. מחזיר null
+            case FIVE://עובד. רק לסדר הכנסת קלט תקין
                 System.out.println("Enter the number of player that score the most goals:");
                 int topScorers = scanner.nextInt();
                 System.out.println(getTopScorers(topScorers));
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
                 break;
 
         }
