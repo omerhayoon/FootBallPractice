@@ -91,5 +91,16 @@ public class Match {
         return awayTeam;
     }
 
-
+    @Override
+    public String toString() {
+        return "Match{" +
+                "id=" + id +
+                ", homeTeam=" + homeTeam +
+                ", awayTeam=" + awayTeam +
+                ", goals=" + goals +
+                ", goalHomaTeam=" + goalHomaTeam +
+                ", goalAwayTeam=" + goalAwayTeam +
+                ", endGame='" + endGame + '\'' +
+                '}';
+    }
 }
